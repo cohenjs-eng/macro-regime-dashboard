@@ -79,10 +79,20 @@ Return ONLY a raw JSON object. No markdown formatting, no backticks, no explanat
 
     const match = clean.match(/\{[\s\S]*\}/);
     if (match) {
-      const parsed = JSON.parse(match[0]);
-      return res.status(200).json(parsed);
+      try {
+        const parsed = JSON.parse(match[0]);
+        return res.status(200).json(parsed);
+      } catch (parseErr) {
+        return res.status(500).json({ error: "JSON parse failed", raw: match[0].substring(0, 800) });
+      }
     } else {
-      return res.status(500).json({ error: "Could not parse market data", raw: text.substring(0, 500) });
+      // Return everything we got so we can debug
+      return res.status(200).json({ 
+        _debug: true,
+        _raw: text.substring(0, 1500),
+        _content_types: data.content?.map(b => b.type),
+        error: "Could not extract JSON from response" 
+      });
     }
   } catch (err) {
     return res.status(500).json({ error: err.message });

@@ -74,7 +74,9 @@ export default function Dashboard() {
       const result = await r.json();
 
       if (result.error) {
-        setErr(result.error + (result.detail ? ": " + result.detail.substring(0, 200) : ""));
+        setErr(result.error + (result._raw ? "\n\nRaw response: " + result._raw.substring(0, 500) : "") + (result.detail ? ": " + result.detail.substring(0, 200) : ""));
+      } else if (result._debug) {
+        setErr("Debug: " + result.error + "\n\nRaw: " + (result._raw || "empty").substring(0, 500));
       } else {
         setData(result);
         setUpdated(new Date());
@@ -184,7 +186,7 @@ export default function Dashboard() {
         ))}
 
         {err && (
-          <div style={{ padding: 10, borderRadius: 6, background: "#ef44440f", border: "1px solid #ef444430", marginBottom: 12, fontSize: 11, color: "#fca5a5" }}>
+          <div style={{ padding: 10, borderRadius: 6, background: "#ef44440f", border: "1px solid #ef444430", marginBottom: 12, fontSize: 11, color: "#fca5a5", whiteSpace: "pre-wrap", wordBreak: "break-all", maxHeight: 300, overflow: "auto" }}>
             {err}
           </div>
         )}
